@@ -162,7 +162,7 @@ func (s BitSlice) ReadBool() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return data&128 != 0, nil
+	return data&0x80 != 0, nil
 }
 
 func (s BitSlice) ReadByte() (byte, error) {
