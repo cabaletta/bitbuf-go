@@ -11,5 +11,5 @@ type sliceContainer struct {
 type transportContainer struct {
 	buf      []byte
 	length   Size
-	capacity func([]byte) Size
+	capacity Size
 }

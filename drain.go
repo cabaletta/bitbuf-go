@@ -6,21 +6,17 @@ type Drain struct {
 
 func NewDrain(buf []byte) Drain {
 	return Drain{&transportContainer{
-		buf:    buf,
-		length: 0,
-		capacity: func(data []byte) Size {
-			return Size(len(data)) * 8
-		},
+		buf:      buf,
+		length:   0,
+		capacity: Size(len(buf)) * 8,
 	}}
 }
 
 func NewCappedDrain(buf []byte, cap Size) Drain {
 	return Drain{&transportContainer{
-		buf:    buf,
-		length: 0,
-		capacity: func(data []byte) Size {
-			return cap
-		},
+		buf:      buf,
+		length:   0,
+		capacity: cap,
 	}}
 }
 
@@ -29,7 +25,6 @@ func (d Drain) IntoInner() []byte {
 }
 
 func (d Drain) DrainInto(to BitBufMut) error {
-	capacity := d.capacity(d.buf)
 	from := NewBitSlice(d.buf)
 	err := from.Advance(d.length)
 	if err != nil {
@@ -37,8 +32,8 @@ func (d Drain) DrainInto(to BitBufMut) error {
 	}
 
 	for true {
-		if d.length < capacity {
-			if to.Remaining() >= 8 && capacity-d.length >= 8 {
+		if d.length < d.capacity {
+			if to.Remaining() >= 8 && d.capacity-d.length >= 8 {
 				val, err := from.ReadByte()
 				if err != nil {
 					panic(err)

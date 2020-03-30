@@ -6,21 +6,17 @@ type Fill struct {
 
 func NewFill(buf []byte) Fill {
 	return Fill{&transportContainer{
-		buf:    buf,
-		length: 0,
-		capacity: func(data []byte) Size {
-			return Size(len(data)) * 8
-		},
+		buf:      buf,
+		length:   0,
+		capacity: Size(len(buf)) * 8,
 	}}
 }
 
 func NewCappedFill(buf []byte, cap Size) Fill {
 	return Fill{&transportContainer{
-		buf:    buf,
-		length: 0,
-		capacity: func(data []byte) Size {
-			return cap
-		},
+		buf:      buf,
+		length:   0,
+		capacity: cap,
 	}}
 }
 
@@ -29,7 +25,6 @@ func (f Fill) IntoInner() []byte {
 }
 
 func (f Fill) FillFrom(from BitBuf) error {
-	capacity := f.capacity(f.buf)
 	to := NewBitSliceMut(f.buf)
 	err := to.Advance(f.length)
 	if err != nil {
@@ -37,8 +32,8 @@ func (f Fill) FillFrom(from BitBuf) error {
 	}
 
 	for true {
-		if f.length < capacity {
-			if from.Remaining() >= 8 && capacity-f.length >= 8 {
+		if f.length < f.capacity {
+			if from.Remaining() >= 8 && f.capacity-f.length >= 8 {
 				val, err := from.ReadByte()
 				if err != nil {
 					panic(err)
