@@ -13,19 +13,3 @@ type transportContainer struct {
 	length   Size
 	capacity func([]byte) Size
 }
-
-type bitSlice struct {
-	*sliceContainer
-}
-
-type bitSliceMut struct {
-	*sliceContainer
-}
-
-type drain struct {
-	*transportContainer
-}
-
-type fill struct {
-	*transportContainer
-}

@@ -1,14 +1,18 @@
 package bitbuf
 
+type BitSlice struct {
+	*sliceContainer
+}
+
 func NewBitSlice(data []byte) BitBuf {
-	return bitSlice{&sliceContainer{
+	return BitSlice{&sliceContainer{
 		data:   data,
 		offset: 0,
 		length: 0,
 	}}
 }
 
-func (s bitSlice) dataAtOffset(offset, size Size) (byte, error) {
+func (s BitSlice) dataAtOffset(offset, size Size) (byte, error) {
 	length := s.Remaining()
 	offset += Size(s.offset)
 	if offset == 0 {
@@ -35,11 +39,11 @@ func (s bitSlice) dataAtOffset(offset, size Size) (byte, error) {
 	}
 }
 
-func (s bitSlice) byteAtOffset(offset Size) (byte, error) {
+func (s BitSlice) byteAtOffset(offset Size) (byte, error) {
 	return s.dataAtOffset(offset, 8)
 }
 
-func (s bitSlice) Advance(bits Size) (e error) {
+func (s BitSlice) Advance(bits Size) (e error) {
 	if bits > s.Remaining() {
 		return InsufficientError{}
 	}
@@ -54,7 +58,7 @@ func (s bitSlice) Advance(bits Size) (e error) {
 	return
 }
 
-func (s bitSlice) Read(dst []byte, bits Size) (Size, error) {
+func (s BitSlice) Read(dst []byte, bits Size) (Size, error) {
 	rem := s.Remaining()
 	if bits > rem {
 		bits = rem
@@ -95,7 +99,7 @@ func (s bitSlice) Read(dst []byte, bits Size) (Size, error) {
 	return bits, nil
 }
 
-func (s bitSlice) ReadAll(dst []byte, bits Size) error {
+func (s BitSlice) ReadAll(dst []byte, bits Size) error {
 	if s.Remaining() < bits {
 		return InsufficientError{}
 	}
@@ -107,7 +111,7 @@ func (s bitSlice) ReadAll(dst []byte, bits Size) error {
 	return nil
 }
 
-func (s bitSlice) ReadAligned(dst []byte) Size {
+func (s BitSlice) ReadAligned(dst []byte) Size {
 	rem := s.Remaining()
 	length := Size(len(dst))
 	if length*8 > rem {
@@ -132,7 +136,7 @@ func (s bitSlice) ReadAligned(dst []byte) Size {
 	return length
 }
 
-func (s bitSlice) ReadAlignedAll(dst []byte) error {
+func (s BitSlice) ReadAlignedAll(dst []byte) error {
 	err := s.ReadAll(dst, Size(len(dst))*8)
 	if err != nil {
 		switch err.(type) {
@@ -149,7 +153,7 @@ func (s bitSlice) ReadAlignedAll(dst []byte) error {
 	return nil
 }
 
-func (s bitSlice) ReadBool() (bool, error) {
+func (s BitSlice) ReadBool() (bool, error) {
 	data, err := s.dataAtOffset(0, 1)
 	if err != nil {
 		return false, err
@@ -161,7 +165,7 @@ func (s bitSlice) ReadBool() (bool, error) {
 	return data&128 != 0, nil
 }
 
-func (s bitSlice) ReadByte() (byte, error) {
+func (s BitSlice) ReadByte() (byte, error) {
 	data, err := s.byteAtOffset(0)
 	if err != nil {
 		return 0, err
@@ -173,10 +177,10 @@ func (s bitSlice) ReadByte() (byte, error) {
 	return data, nil
 }
 
-func (s bitSlice) Remaining() Size {
+func (s BitSlice) Remaining() Size {
 	return Size(len(s.data)*8 - int(s.offset))
 }
 
-func (s bitSlice) Len() Size {
+func (s BitSlice) Len() Size {
 	return s.length
 }

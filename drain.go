@@ -1,7 +1,11 @@
 package bitbuf
 
+type Drain struct {
+	*transportContainer
+}
+
 func NewDrain(buf []byte) Drain {
-	return drain{&transportContainer{
+	return Drain{&transportContainer{
 		buf:    buf,
 		length: 0,
 		capacity: func(data []byte) Size {
@@ -11,7 +15,7 @@ func NewDrain(buf []byte) Drain {
 }
 
 func NewCappedDrain(buf []byte, cap Size) Drain {
-	return drain{&transportContainer{
+	return Drain{&transportContainer{
 		buf:    buf,
 		length: 0,
 		capacity: func(data []byte) Size {
@@ -20,11 +24,11 @@ func NewCappedDrain(buf []byte, cap Size) Drain {
 	}}
 }
 
-func (d drain) IntoInner() []byte {
+func (d Drain) IntoInner() []byte {
 	return d.buf
 }
 
-func (d drain) DrainInto(to BitBufMut) error {
+func (d Drain) DrainInto(to BitBufMut) error {
 	capacity := d.capacity(d.buf)
 	from := NewBitSlice(d.buf)
 	err := from.Advance(d.length)
@@ -62,6 +66,6 @@ func (d drain) DrainInto(to BitBufMut) error {
 	return nil
 }
 
-func (d drain) AsBuf() BitBuf {
+func (d Drain) AsBuf() BitBuf {
 	return NewBitSlice(d.buf)
 }

@@ -1,7 +1,11 @@
 package bitbuf
 
+type Fill struct {
+	*transportContainer
+}
+
 func NewFill(buf []byte) Fill {
-	return fill{&transportContainer{
+	return Fill{&transportContainer{
 		buf:    buf,
 		length: 0,
 		capacity: func(data []byte) Size {
@@ -11,7 +15,7 @@ func NewFill(buf []byte) Fill {
 }
 
 func NewCappedFill(buf []byte, cap Size) Fill {
-	return fill{&transportContainer{
+	return Fill{&transportContainer{
 		buf:    buf,
 		length: 0,
 		capacity: func(data []byte) Size {
@@ -20,11 +24,11 @@ func NewCappedFill(buf []byte, cap Size) Fill {
 	}}
 }
 
-func (f fill) IntoInner() []byte {
+func (f Fill) IntoInner() []byte {
 	return f.buf
 }
 
-func (f fill) FillFrom(from BitBuf) error {
+func (f Fill) FillFrom(from BitBuf) error {
 	capacity := f.capacity(f.buf)
 	to := NewBitSliceMut(f.buf)
 	err := to.Advance(f.length)
@@ -62,6 +66,6 @@ func (f fill) FillFrom(from BitBuf) error {
 	return nil
 }
 
-func (f fill) AsBuf() BitBuf {
+func (f Fill) AsBuf() BitBuf {
 	return NewBitSlice(f.buf)
 }

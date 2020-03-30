@@ -1,14 +1,18 @@
 package bitbuf
 
+type BitSliceMut struct {
+	*sliceContainer
+}
+
 func NewBitSliceMut(data []byte) BitBufMut {
-	return bitSliceMut{&sliceContainer{
+	return BitSliceMut{&sliceContainer{
 		data:   data,
 		offset: 0,
 		length: 0,
 	}}
 }
 
-func (s bitSliceMut) write(data byte, bits Size) error {
+func (s BitSliceMut) write(data byte, bits Size) error {
 	bitsInv := 8 - bits
 	low := data & (0xFF << bitsInv)
 	high := data | (0xFF >> bitsInv)
@@ -25,7 +29,7 @@ func (s bitSliceMut) write(data byte, bits Size) error {
 	return s.Advance(bits)
 }
 
-func (s bitSliceMut) Advance(bits Size) error {
+func (s BitSliceMut) Advance(bits Size) error {
 	if s.Remaining() < bits {
 		return InsufficientError{}
 	}
@@ -40,7 +44,7 @@ func (s bitSliceMut) Advance(bits Size) error {
 	return nil
 }
 
-func (s bitSliceMut) Write(data []byte, bits Size) (Size, error) {
+func (s BitSliceMut) Write(data []byte, bits Size) (Size, error) {
 	rem := s.Remaining()
 	if bits > rem {
 		bits = rem
@@ -77,7 +81,7 @@ func (s bitSliceMut) Write(data []byte, bits Size) (Size, error) {
 	return bits, nil
 }
 
-func (s bitSliceMut) WriteAll(data []byte, bits Size) error {
+func (s BitSliceMut) WriteAll(data []byte, bits Size) error {
 	if s.Remaining() < bits {
 		return InsufficientError{}
 	}
@@ -89,7 +93,7 @@ func (s bitSliceMut) WriteAll(data []byte, bits Size) error {
 	return nil
 }
 
-func (s bitSliceMut) WriteAligned(data []byte) Size {
+func (s BitSliceMut) WriteAligned(data []byte) Size {
 	length, err := s.Write(data, Size(len(data))*8)
 	if err != nil {
 		panic(err)
@@ -97,7 +101,7 @@ func (s bitSliceMut) WriteAligned(data []byte) Size {
 	return length
 }
 
-func (s bitSliceMut) WriteAlignedAll(data []byte) error {
+func (s BitSliceMut) WriteAlignedAll(data []byte) error {
 	bits := Size(len(data))
 	if bits > s.Remaining() {
 		return InsufficientError{}
@@ -110,7 +114,7 @@ func (s bitSliceMut) WriteAlignedAll(data []byte) error {
 	return nil
 }
 
-func (s bitSliceMut) WriteBool(val bool) error {
+func (s BitSliceMut) WriteBool(val bool) error {
 	if len(s.data) == 0 {
 		return InsufficientError{}
 	}
@@ -123,7 +127,7 @@ func (s bitSliceMut) WriteBool(val bool) error {
 	return s.Advance(1)
 }
 
-func (s bitSliceMut) WriteByte(val byte) error {
+func (s BitSliceMut) WriteByte(val byte) error {
 	if len(s.data) == 0 {
 		return InsufficientError{}
 	}
@@ -142,10 +146,10 @@ func (s bitSliceMut) WriteByte(val byte) error {
 	return s.Advance(8)
 }
 
-func (s bitSliceMut) Remaining() Size {
+func (s BitSliceMut) Remaining() Size {
 	return Size(len(s.data)*8 - int(s.offset))
 }
 
-func (s bitSliceMut) Len() Size {
+func (s BitSliceMut) Len() Size {
 	return s.length
 }

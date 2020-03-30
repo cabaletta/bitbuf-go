@@ -25,15 +25,3 @@ type BitBufMut interface {
 	Remaining() Size
 	Len() Size
 }
-
-type Drain interface {
-	IntoInner() []byte
-	DrainInto(buf BitBufMut) error
-	AsBuf() BitBuf
-}
-
-type Fill interface {
-	IntoInner() []byte
-	FillFrom(buf BitBuf) error
-	AsBuf() BitBuf
-}
