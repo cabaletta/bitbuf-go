@@ -5,11 +5,7 @@ type Fill struct {
 }
 
 func NewFill(buf []byte) Fill {
-	return Fill{&transportContainer{
-		buf:      buf,
-		length:   0,
-		capacity: Size(len(buf)) * 8,
-	}}
+	return NewCappedFill(buf, Size(len(buf))*8)
 }
 
 func NewCappedFill(buf []byte, cap Size) Fill {

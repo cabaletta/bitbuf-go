@@ -5,11 +5,7 @@ type Drain struct {
 }
 
 func NewDrain(buf []byte) Drain {
-	return Drain{&transportContainer{
-		buf:      buf,
-		length:   0,
-		capacity: Size(len(buf)) * 8,
-	}}
+	return NewCappedDrain(buf, Size(len(buf))*8)
 }
 
 func NewCappedDrain(buf []byte, cap Size) Drain {
