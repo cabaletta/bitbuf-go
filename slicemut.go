@@ -4,7 +4,7 @@ type BitSliceMut struct {
 	*sliceContainer
 }
 
-func NewBitSliceMut(data []byte) BitBufMut {
+func NewBitSliceMut(data []byte) BitSliceMut {
 	return BitSliceMut{&sliceContainer{
 		data:   data,
 		offset: 0,

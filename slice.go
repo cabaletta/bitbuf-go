@@ -4,7 +4,7 @@ type BitSlice struct {
 	*sliceContainer
 }
 
-func NewBitSlice(data []byte) BitBuf {
+func NewBitSlice(data []byte) BitSlice {
 	return BitSlice{&sliceContainer{
 		data:   data,
 		offset: 0,
